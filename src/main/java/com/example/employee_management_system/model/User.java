@@ -5,20 +5,16 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "employees")
-public class Employee extends Person{
+@Table(name = "users")
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String employeeId;
+    @Column(unique = true, nullable = false)
+    private String username;
 
     @Column(nullable = false)
-    private String department;
-
-    @Column(nullable = false)
-    private Double salary;
-
+    private String password;
 }

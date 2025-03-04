@@ -8,13 +8,12 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-@Table
 @MappedSuperclass
-public class Person {
+public abstract class Person {
 
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
-    private LocalDate dateOBirth;
+    private LocalDate dateOfBirth;
 }

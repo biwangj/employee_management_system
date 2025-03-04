@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>register</title>
+    <link rel="stylesheet" href="/css/register.css">
+</head>
+
+<body>
+<section>
+    <form action="/user/add" method="post">
+
+        <h1>Create an Account</h1>
+
+        <!-- Show error message -->
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <div class = "inputbox">
+            <input name="username" id="username" type="text" required>
+            <label for="username">Username</label>
+        </div>
+
+        <div class = "inputbox">
+            <input type="password" id="password" name="password" required>
+            <label for="password">Password</label>
+        </div>
+
+        <div class="inputbox">
+            <input type="password" id="confirm" name="confirmPassword" required>
+            <label for="confirm">Confirm Password</label>
+        </div>
+
+        <button id="submit" type="submit">Register</button>
+
+        <div class="register">
+            <p>Existing User? <a href="/login">Login</a></p>
+        </div>
+    </form>
+</section>
+</body>
+</html>
