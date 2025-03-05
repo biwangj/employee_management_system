@@ -38,7 +38,7 @@ public class AddUserController {
 
             //creates user if passwords match
             userService.addUser(user);
-            return "redirect:/login";
+            return "redirect:/login/page";
 
             //checks if username or email already exists in db
         } catch (DataIntegrityViolationException e) {

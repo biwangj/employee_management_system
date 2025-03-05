@@ -38,6 +38,7 @@ public class EmployeeService {
         LocalDate cutoffDate = LocalDate.now().minusYears(age);
         return employeeRepo.findByDateOfBirthBefore(cutoffDate);
     }
+
     public List<Employee> getEmployeeByDepartment(String department) {
         return employeeRepo.findByDepartment(department);
     }
@@ -55,14 +56,6 @@ public class EmployeeService {
 
     public void deleteEmployee(Long id) {
         employeeRepo.deleteById(id);
-    }
-
-    public void removeEmployee(Long id) {
-        Optional<Employee> employeeOpt = employeeRepo.findById(id);
-        if(employeeOpt.isPresent()) {
-            Employee employee =employeeOpt.get();
-            employeeRepo.deleteEmployeeByName(employee);
-        }
     }
 
     public List<Employee> findEmployeesByDepartment(String department) {

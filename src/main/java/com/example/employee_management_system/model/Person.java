@@ -2,7 +2,6 @@ package com.example.employee_management_system.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.time.LocalDate;

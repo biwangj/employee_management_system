@@ -9,6 +9,12 @@
 
 <body>
 
+    <div class="logout-container">
+        <form action="/logout" method="post">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </div>
+
     <h2>Employee List</h2>
 
     <!-- Search by Department -->
@@ -23,6 +29,9 @@
             <option value="Accounting">Accounting</option>
         </select>
         <button type="submit">Filter</button>
+        <div class="btn-clear">
+            <a href="/dashboard">Clear</a>
+        </div>
     </form>
 
     <!-- Search by Age -->

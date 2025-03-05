@@ -3,8 +3,10 @@ package com.example.employee_management_system.service;
 import com.example.employee_management_system.model.User;
 import com.example.employee_management_system.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,6 +15,12 @@ public class UserService {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User addUser(User user) {
@@ -20,7 +28,13 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    public User findByUsername(String username) {
-        return userRepo.findByUsername(username).orElseGet(null);
+    public String verify(User user) {
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+
+        if(authentication.isAuthenticated()) {
+            return jwtService.generateToken(user.getUsername());
+        }
+        return "Fail";
     }
 }

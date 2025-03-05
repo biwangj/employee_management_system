@@ -22,9 +22,14 @@ public class PageController {
         return "register";
     }
 
-    @GetMapping("/login")
+    @GetMapping("/login/page")
     public String login() {
         return "login";
+    }
+
+    @GetMapping("/logout")
+    public String logout() {
+        return "redirect:/login/page";
     }
 
     @GetMapping("/dashboard")

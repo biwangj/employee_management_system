@@ -14,7 +14,4 @@ public interface EmployeeRepo extends JpaRepository<Employee, Long> {
     List<Employee> findByDepartment(String department);
     List<Employee> findByDateOfBirthBefore(LocalDate date);
     List<Employee> findByName(String name);
-
-    @Transactional
-    void deleteEmployeeByName(Employee employee);
 }

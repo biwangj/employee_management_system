@@ -1,12 +1,21 @@
 package com.example.employee_management_system.config;
 
+import com.example.employee_management_system.filter.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -15,47 +24,42 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private JwtFilter jwtFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF
+                .csrf(customizer -> customizer.disable()) // Disable CSRF
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/update/**", "/employees/update-employee/**", "/update-employee/**").permitAll() // Public endpoints
-
-                        .requestMatchers("/login", "/register", "/employees/delete/**", "/employees/delete").permitAll()
-                        .requestMatchers("/employees/update-employee/**").permitAll() // Allow update page
-
-                        .anyRequest().permitAll() // Protect other endpoints
-
-
-                )
-                .formLogin(login -> login
-                        .loginPage("/login") // Ensure you have a /login page mapped in your controller
-                        .defaultSuccessUrl("/dashboard", true) // Redirect after login
+                        .requestMatchers("/login", "/register", "/css/**", "/user/add", "/user/login").permitAll() // Public endpoints
+                        .anyRequest().authenticated() // Protect other endpoints
+                ).formLogin(form -> form
+                        .loginPage("/login/page") //use login page
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/dashboard", true)
+                        .failureUrl("/login/page?error=true")
                         .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login") // Redirect after logout
-                        .permitAll()
-                );
+                ).logout(logout -> logout.logoutUrl("/logout")
+                        .logoutSuccessUrl("/login/page").permitAll());
+//                ).httpBasic(Customizer.withDefaults())
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(new BCryptPasswordEncoder());
+        provider.setUserDetailsService(userDetailsService);
+        return provider;
+    }
 
-//    public AuthenticationProvider authenticationProvider() {
-//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
-//        return provider;
-//    }
-
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        UserDetails user = User.withUsername("admin")
-//                .password("{noop}admin") // NoOpPasswordEncoder for testing purposes
-//                .roles("ADMIN")
-//                .build();
-//
-//        return new InMemoryUserDetailsManager(user);
-//    }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 }

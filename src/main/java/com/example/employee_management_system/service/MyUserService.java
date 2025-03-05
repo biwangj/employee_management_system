@@ -1,27 +1,30 @@
 package com.example.employee_management_system.service;
 
 import com.example.employee_management_system.model.User;
+import com.example.employee_management_system.model.UserPrincipal;
 import com.example.employee_management_system.repo.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class MyUserService implements UserDetailsService {
 
-    private final UserRepo userRepo;
+    @Autowired
+    private UserRepo userRepo;
 
-    public CustomUserDetailsService(UserRepo userRepo) {
-        this.userRepo = userRepo;
-    }
-
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .build();
+        User user = userRepo.findByUsername(username);
+
+        if(user == null) {
+            System.out.println("User not found");
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return new UserPrincipal(user);
     }
 }
