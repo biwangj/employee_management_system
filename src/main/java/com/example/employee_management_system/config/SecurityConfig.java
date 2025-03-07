@@ -32,7 +32,9 @@ public class SecurityConfig {
         http
                 .csrf(customizer -> customizer.disable()) // Disable CSRF
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/css/**", "/user/add", "/user/login").permitAll() // Public endpoints
+                        .requestMatchers("/login", "/register", "/css/**", "/user/add",
+                                "/user/login", "/employees/delete/{id}", "/departments/list", "/departments/add",
+                                "/departments/update/{id}", "/departments/delete/{id}", "/employees/add").permitAll() // Public endpoints
                         .anyRequest().authenticated() // Protect other endpoints
                 ).formLogin(form -> form
                         .loginPage("/login/page") //use login page

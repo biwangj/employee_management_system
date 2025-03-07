@@ -3,8 +3,9 @@ package com.example.employee_management_system.service;
 import com.example.employee_management_system.model.Employee;
 import com.example.employee_management_system.repo.EmployeeRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -17,8 +18,11 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepo employeeRepo;
 
-    public List<Employee> getAllEmployees() {
-        return employeeRepo.findAll();
+    public Page<Employee> getAllEmployees(Pageable pageable) {
+        Page<Employee> employees = employeeRepo.findAll(pageable);
+        //for debug log
+        System.out.println("Fetched Employees: " + employees.getContent());
+        return employeeRepo.findAll(pageable);
     }
 
     public Employee addEmployee(Employee employee) {
@@ -29,8 +33,8 @@ public class EmployeeService {
         return employeeRepo.findById(employeeId);
     }
 
-    public List<Employee> getEmployeeByName(String name) {
-        return employeeRepo.findByName(name);
+    public Page<Employee> getEmployeeByName(String search, Pageable pageable) {
+        return employeeRepo.findByNameContainingIgnoreCase(search, pageable);
     }
 
     public List<Employee> getEmployeesByAge(int age) {
@@ -62,6 +66,10 @@ public class EmployeeService {
         return employeeRepo.findByDepartment(department);
     }
 
+    public List<String> getAllDepartments() {
+        return employeeRepo.findDistinctDepartments();
+    }
+
     public double averageSalary() {
         List<Employee> employees = employeeRepo.findAll();
         return employees.stream().mapToDouble(Employee::getSalary).average().orElse(0.0);
@@ -71,5 +79,9 @@ public class EmployeeService {
         List<Employee> employees = employeeRepo.findAll();
         return  (int) employees.stream().mapToInt(employee -> Period.between(employee.getDateOfBirth(),
                         LocalDate.now()).getYears()).average().orElse(0.0);
+    }
+
+    public List<Employee> getEmployeesByPartialName(String search) {
+        return employeeRepo.findByNameContainingIgnoreCase(search);
     }
 }

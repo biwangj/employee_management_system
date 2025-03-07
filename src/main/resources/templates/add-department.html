@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Departments</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/department.js" defer></script>
+  <script type="module" src="/js/dashboard.js"></script>
+</head>
+<body>
+<h1>Manage Departments</h1>
+
+<!-- Add Department Form -->
+<form id="departmentForm">
+  <label for="departmentName">Department Name:</label>
+  <input type="text" id="departmentName" name="departmentName" required>
+  <button type="submit" href="/dashboard">Add Department</button>
+</form>
+
+<!-- Departments Table -->
+<h2>Department List</h2>
+
+<table id="departmentTableBody">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Department Name</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- Departments will be loaded here dynamically -->
+  </tbody>
+</table>
+
+<div id="paginationControls"></div>
+
+<a href="/dashboard">Back to Dashboard</a>
+
+</body>
+</html>

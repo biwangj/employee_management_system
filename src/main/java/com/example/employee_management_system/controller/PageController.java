@@ -1,8 +1,13 @@
 package com.example.employee_management_system.controller;
 
+import com.example.employee_management_system.model.Department;
 import com.example.employee_management_system.model.Employee;
+import com.example.employee_management_system.repo.DepartmentRepo;
 import com.example.employee_management_system.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +21,9 @@ public class PageController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private DepartmentRepo departmentRepo;
 
     @GetMapping("/register")
     public String register() {
@@ -33,18 +41,19 @@ public class PageController {
     }
 
     @GetMapping("/dashboard")
-    public String viewEmployees(@RequestParam(value = "search", required = false) String search, Model model) {
-        List<Employee> employees;
+    public String viewEmployees(@RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "5") int size,
+                                Model model) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Employee> employeePage = employeeService.getAllEmployees(pageable);
 
-        if(search != null && !search.isEmpty()) {
-            employees = employeeService.getEmployeeByName(search);
-        }else {
-            employees =employeeService.getAllEmployees();
-        }
+        // Debugging statement
+        System.out.println("Passing Employees to View: " + employeePage.getContent());
 
-        model.addAttribute("employees", employees);
-        model.addAttribute("averageSalary", employeeService.averageSalary());
-        model.addAttribute("averageAge", employeeService.averageAge());
+        model.addAttribute("employees", employeePage.getContent()); // Get list from Page
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", employeePage.getTotalPages());
+
         return "dashboard";
     }
 
@@ -69,10 +78,9 @@ public class PageController {
         return "redirect:/dashboard";
     }
 
-    @GetMapping("/employees/delete/{id}")
-    public String deleteEmployee(@PathVariable Long id) {
-        employeeService.deleteEmployee(id);
-        return "redirect:/dashboard";
+    @GetMapping("add-department")
+    public String addDepartment() {
+        return "add-department";
     }
 
     @PostMapping("/employees/update/{id}")
@@ -81,29 +89,24 @@ public class PageController {
         return "redirect:/dashboard"; // Redirect back to the dashboard after update
     }
 
-    // Filter by Department
-    @GetMapping("/filter/department")
-    public String filterByDepartment(@RequestParam String department, Model model) {
-        model.addAttribute("employees", employeeService.getEmployeeByDepartment(department));
-        return "dashboard"; // Refreshes page with filtered employees
-    }
-
-    @GetMapping("/filter/age")
-    public String filterByAge(@RequestParam int age, Model model) {
-        List<Employee> filteredEmployees = employeeService.getEmployeesByAge(age);
-        model.addAttribute("employees", filteredEmployees);
-        return "dashboard"; // Refresh the dashboard with filtered results
-    }
+//    @GetMapping("/filter/age")
+//    public String filterByAge(@RequestParam int age, Model model) {
+//        List<Employee> filteredEmployees = employeeService.getEmployeesByAge(age);
+//        model.addAttribute("employees", filteredEmployees);
+//        return "dashboard"; // Refresh the dashboard with filtered results
+//    }
 
     @GetMapping("/employees/update-employee/{id}")
     public String showUpdateForm(@PathVariable Long id, Model model) {
-        Optional<Employee> employee = employeeService.getEmployeeById(id);
-        if (employee.isPresent()) {
-            model.addAttribute("employee", employee.get());
-            return "update-employee"; // Ensure this file exists in `templates/`
-        } else {
-            return "dashboard"; // Redirect if employee not found
-        }
+        Employee employee = employeeService.getEmployeeById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        List<Department> departments = departmentRepo.findAll(); // Fetch departments
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("departments", departments); // Add departments list
+
+        return "update-employee"; // Thymeleaf template name
     }
 
 }

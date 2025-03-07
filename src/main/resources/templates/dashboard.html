@@ -5,109 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Dashboard</title>
     <link rel="stylesheet" href="/css/dashboard.css">
+    <script type="module" src="/js/dashboard.js"></script>
 </head>
 
 <body>
+<div class="logout-container">
+    <form action="/logout" method="post">
+        <button type="submit" class="logout-btn">Logout</button>
+    </form>
+</div>
 
-    <div class="logout-container">
-        <form action="/logout" method="post">
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
+<h2>Employee List</h2>
+
+<!-- Filter Container -->
+<div style="display: flex; flex-direction: column; gap: 10px;">
+    <!-- Filter by Department -->
+    <div>
+        <label for="departmentFilter">Filter by Department:</label>
+        <select id="departmentFilter">
+            <option value="">Loading...</option>
+        </select>
     </div>
 
-    <h2>Employee List</h2>
+    <!-- Filter by Age -->
+    <div>
+        <label for="ageFilter">Filter by Age:</label>
+        <input type="number" id="ageFilter" placeholder="Enter Age" min="18">
+    </div>
 
-    <!-- Search by Department -->
-    <form action="/filter/department" method="get">
-        <label for="department">Filter by Department:</label>
-        <select id="department" name="department" required>
-            <option value="Admin">Admin</option>
-            <option value="HR">HR</option>
-            <option value="IT">Information Technology</option>
-            <option value="Finance">Finance</option>
-            <option value="Sales">Sales</option>
-            <option value="Accounting">Accounting</option>
-        </select>
-        <button type="submit">Filter</button>
-        <div class="btn-clear">
-            <a href="/dashboard">Clear</a>
-        </div>
-    </form>
+    <!-- Search Employees -->
+    <div>
+        <label for="searchInput">Search:</label>
+        <input type="text" id="searchInput" placeholder="Search Employees...">
+    </div>
 
-    <!-- Search by Age -->
-    <form action="/filter/age" method="get">
-        <label for="age">Filter by Age:</label>
-        <input type="number" id="age" name="age" min="18" required>
-        <button type="submit">Filter</button>
-    </form>
-
-    <!-- Search Bar -->
-    <form method="get" action="/dashboard" class="search">
-        <div class="search-content">
-            <input type="text" name="search" class="search-input" placeholder="Search employees here..."
-                   th:value="${param.search}">
-        </div>
-    </form>
-    
-    <!-- Add Employee Button -->
-    <a href="/add-employee">
-        <button type="button">Add Employee</button>
-    </a>
-
-    <!-- Employee Table -->
-    <table id="employeeTable">
-        <thead>
-            <tr>
-                <th>Employee ID</th>
-                <th>Name</th>
-                <th>Birthday</th>
-                <th>Department</th>
-                <th>Salary</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Employee Data Will Be Fetched Here Using Thymeleaf -->
-            <tr th:each="employee : ${employees}">
-                <td th:text="${employee.employeeId}"></td>
-                <td th:text="${employee.name}"></td>
-                <td th:text="${employee.dateOfBirth}"></td>
-                <td th:text="${employee.department}"></td>
-                <td th:text="${employee.salary}"></td>
-                <td>
-                    <div class="action-container">
-                         <a th:href="@{/employees/update-employee/{id}(id=${employee.id})}">
-                            <button type="button">Update</button>
-                         </a>
-
-                        <a th:href="@{/employees/delete/{id}(id=${employee.id})}">
-                            <button type="button" class="remove">Delete</button>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <table id="averageTable" th:if="${employees != null and !employees.isEmpty()}">
-        <thead>
-        <tr>
-            <th>Average Age</th>
-            <th>Average Salary</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td th:text="${averageAge}"></td>
-            <td th:text="${averageSalary}"></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <p th:if="${param.search != null and param.search != '' and (employees == null or employees.isEmpty())}">
-        No employees found.
-    </p>
+</div>
+<button id="clearFilters">Clear Filters</button>
 
 
+<a href="/add-employee">
+    <button type="button">Add Employee</button>
+</a>
+
+<a href="/add-department">
+    <button type="button">Add Departments</button>
+</a>
+
+<table id="employeeTable">
+    <thead>
+    <tr>
+        <th>Employee ID</th>
+        <th>Name</th>
+        <th>Birthday</th>
+        <th>Department</th>
+        <th>Salary</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- insert employees here -->
+    </tbody>
+</table>
+
+<div id="paginationControls"></div>
+
+<table id="averageTable">
+    <thead>
+    <tr>
+        <th>Average Age</th>
+        <th>Average Salary</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td id="averageAge">Loading...</td>
+        <td id="averageSalary">Loading...</td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>
